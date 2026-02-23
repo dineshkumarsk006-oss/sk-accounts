@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Details — S.K. Accounts</title>
+    <meta name="description" content="Record driver wages, vehicle and driver expenses.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Mobile sidebar overlay -->
+    <div class="sb-overlay" id="sbOverlay"></div>
+
+    <!-- Toast container -->
+    <div class="toast-stack" id="toastStack"></div>
+
+    <div class="app-shell">
+
+        <!-- ══════════ SIDEBAR ══════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sb-brand">
+                <div class="sb-logo">SK</div>
+                <span class="sb-name">S.K. Accounts</span>
+            </div>
+            <div class="sb-nav">
+                <div class="sb-section-label">Workspace</div>
+                <nav>
+                    <a href="index.html">
+                        <i data-lucide="package"></i>
+                        Inventory Entry
+                    </a>
+                    <a href="sales_inventory.html" class="active">
+                        <i data-lucide="truck"></i>
+                        Driver Details
+                    </a>
+                </nav>
+            </div>
+            <div class="sb-footer">
+                <p class="sb-footer-text">S.K. Accounts · v2.0</p>
+            </div>
+        </aside>
+
+        <!-- ══════════ MAIN AREA ══════════ -->
+        <div class="main-area">
+
+            <!-- Topbar -->
+            <div class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <span class="topbar-crumb">S.K. Accounts</span>
+                <span class="topbar-sep">/</span>
+                <span class="topbar-page">Driver Details</span>
+                <div class="topbar-gap"></div>
+                <span class="topbar-date" id="topbarDate"></span>
+            </div>
+
+            <!-- Page content -->
+            <div class="page-content">
+
+                <!-- Header -->
+                <div class="page-header">
+                    <h1>Driver Details Entry</h1>
+                    <p>Track vehicle expenses, driver wages and operational costs</p>
+                </div>
+
+                <!-- ── Expense Summary ── -->
+                <p class="section-label">Summary</p>
+                <div class="expense-grid">
+                    <div class="expense-card">
+                        <div class="expcard-icon eci-amber"><i data-lucide="car"></i></div>
+                        <div class="expcard-lbl">Vehicle Expenses</div>
+                        <div class="expcard-val" id="sumVehicle">₹0</div>
+                    </div>
+                    <div class="expense-card">
+                        <div class="expcard-icon eci-blue"><i data-lucide="user"></i></div>
+                        <div class="expcard-lbl">Driver Expenses</div>
+                        <div class="expcard-val" id="sumDriver">₹0</div>
+                    </div>
+                    <div class="expense-card">
+                        <div class="expcard-icon eci-green"><i data-lucide="wallet"></i></div>
+                        <div class="expcard-lbl">Total Paid</div>
+                        <div class="expcard-val" id="sumTotal">₹0</div>
+                    </div>
+                </div>
+
+                <!-- ── Entry Form ── -->
+                <p class="section-label">New Entry</p>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Add Driver Record</div>
+                            <div class="card-sub">Select expense type and enter the amount</div>
+                        </div>
+                        <span class="pill pill-green">Expense</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="driverForm" novalidate>
+                            <div class="form-grid">
+
+                                <div class="form-group" id="grp-driverName">
+                                    <label for="driverName">Driver Name</label>
+                                    <input type="text" id="driverName" name="driverName" placeholder="Enter driver name"
+                                        required>
+                                    <span class="field-error">Driver name is required.</span>
+                                </div>
+
+                                <div class="form-group" id="grp-entryDate">
+                                    <label for="entryDate">Date &amp; Time</label>
+                                    <input type="datetime-local" id="entryDate" name="entryDate" required>
+                                    <span class="field-error">Date is required.</span>
+                                </div>
+
+                                <div class="form-group" id="grp-expenseType">
+                                    <label for="expenseType">Expense Type</label>
+                                    <select id="expenseType" name="expenseType" required>
+                                        <option value="" disabled selected>Select expense type</option>
+                                        <option value="Vehicle Expense">Vehicle Expense</option>
+                                        <option value="Driver Expense">Driver Expense</option>
+                                    </select>
+                                    <span class="field-error">Please select an expense type.</span>
+                                </div>
+
+                                <div class="form-group" id="grp-amount">
+                                    <label for="amount">Amount (₹)</label>
+                                    <input type="number" id="amount" name="amount" placeholder="0.00" min="0"
+                                        step="0.01" required>
+                                    <span class="field-error">Amount is required.</span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-footer">
+                                <button type="button" class="btn-outline" id="btnClearDriver">
+                                    <i data-lucide="rotate-ccw"></i> Clear
+                                </button>
+                                <button type="submit" class="btn-primary" id="btnSaveDriver">
+                                    <i data-lucide="check"></i> Save Entry
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ── Records ── -->
+                <p class="section-label">Records</p>
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title" id="entriesHeading">Driver Entries</span>
+                        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                            <span class="entries-info" id="entriesInfo"></span>
+                            <button id="btnResetDriverEntries" class="btn-danger">
+                                <i data-lucide="trash-2"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="driverTable">
+                            <thead>
+                                <tr>
+                                    <th>Date &amp; Time</th>
+                                    <th>Driver Name</th>
+                                    <th>Expense Type</th>
+                                    <th>Amount (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div><!-- /page-content -->
+        </div><!-- /main-area -->
+    </div><!-- /app-shell -->
+
+    <!-- ── Reset Confirm Modal ── -->
+    <div id="driverResetModal" class="confirm-overlay">
+        <div class="confirm-box">
+            <div class="confirm-inner">
+                <div class="confirm-icon-wrap"><i data-lucide="alert-triangle"></i></div>
+                <h3>Reset All Driver Entries?</h3>
+                <p>This will permanently delete <strong>all driver records</strong>.<br>This action cannot be undone.
+                </p>
+            </div>
+            <div class="confirm-footer">
+                <button id="btnCancelDriverReset" class="btn-outline">Cancel</button>
+                <button id="btnConfirmDriverReset" class="btn-danger-solid">
+                    <i data-lucide="trash-2"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ═══════════════════════════════════════
+           DRIVER DETAILS — FULL INTERACTIVE LOGIC
+           ═══════════════════════════════════════ */
+
+        /* ── Init Lucide ── */
+        lucide.createIcons();
+
+        /* ── Topbar date ── */
+        (function updateDate() {
+            document.getElementById('topbarDate').textContent =
+                new Date().toLocaleDateString('en-IN', {
+                    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+                });
+            setTimeout(updateDate, 30000);
+        })();
+
+        /* ── Toast System ── */
+        function showToast(message, type = 'success') {
+            const icons = { success: 'check-circle', error: 'x-circle', info: 'info' };
+            const stack = document.getElementById('toastStack');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `
+        <span class="toast-icon"><i data-lucide="${icons[type] || 'info'}"></i></span>
+        <span>${message}</span>`;
+            stack.appendChild(el);
+            lucide.createIcons({ nodes: [el] });
+            setTimeout(() => {
+                el.classList.add('toast-out');
+                setTimeout(() => el.remove(), 280);
+            }, 3200);
+        }
+
+        /* ── Mobile Sidebar ── */
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sbOverlay');
+        const menuBtn = document.getElementById('mobileMenuBtn');
+
+        function openSidebar() { sidebar.classList.add('sb-open'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeSidebar() { sidebar.classList.remove('sb-open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+
+        menuBtn.addEventListener('click', () =>
+            sidebar.classList.contains('sb-open') ? closeSidebar() : openSidebar()
+        );
+        overlay.addEventListener('click', closeSidebar);
+        sidebar.querySelectorAll('nav a').forEach(a =>
+            a.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); })
+        );
+
+        /* ── ESC closes modals / sidebar ── */
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeSidebar();
+                document.getElementById('driverResetModal').classList.remove('active');
+            }
+        });
+
+        /* ── Default datetime ── */
+        function nowLocal() {
+            const t = new Date();
+            t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+            return t.toISOString().slice(0, 16);
+        }
+        document.getElementById('entryDate').value = nowLocal();
+
+        /* ── Storage Helpers ── */
+        function getDriverEntries() {
+            return JSON.parse(localStorage.getItem('sk_driver_data') || '[]');
+        }
+        function saveDriverEntry(entry) {
+            const all = getDriverEntries();
+            all.push(entry);
+            localStorage.setItem('sk_driver_data', JSON.stringify(all));
+        }
+
+        /* ── Summary – with pop animation ── */
+        function animateVal(el, newVal) {
+            if (el.textContent !== newVal) {
+                el.textContent = newVal;
+                el.classList.remove('updated');
+                void el.offsetWidth;
+                el.classList.add('updated');
+            }
+        }
+
+        function updateSummary(all) {
+            const vehicle = all.filter(e => e.expenseType === 'Vehicle Expense')
+                .reduce((s, e) => s + parseFloat(e.amount || 0), 0);
+            const driver = all.filter(e => e.expenseType === 'Driver Expense')
+                .reduce((s, e) => s + parseFloat(e.amount || 0), 0);
+            const total = vehicle + driver;
+            const fmt = n => '₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+            animateVal(document.getElementById('sumVehicle'), fmt(vehicle));
+            animateVal(document.getElementById('sumDriver'), fmt(driver));
+            animateVal(document.getElementById('sumTotal'), fmt(total));
+        }
+
+        /* ── Render Table ── */
+        function renderTable(highlightId = null) {
+            const all = getDriverEntries().sort((a, b) => new Date(b.date) - new Date(a.date));
+            const visible = all.slice(0, 100);
+            const tbody = document.querySelector('#driverTable tbody');
+            const heading = document.getElementById('entriesHeading');
+            const info = document.getElementById('entriesInfo');
+
+            heading.textContent = `Driver Entries (${all.length})`;
+            info.textContent = all.length > 100 ? `Showing latest 100 of ${all.length}` : '';
+
+            tbody.innerHTML = '';
+
+            if (all.length === 0) {
+                tbody.innerHTML = `<tr class="tbody-empty"><td colspan="4">No entries yet. Add your first record above.</td></tr>`;
+                updateSummary(all);
+                return;
+            }
+
+            visible.forEach(e => {
+                const expType = e.expenseType || '—';
+                const isVehicle = expType === 'Vehicle Expense';
+                const isDriver = expType === 'Driver Expense';
+                const badgeClass = isVehicle ? 'badge-vehicle' : isDriver ? 'badge-driver' : '';
+
+                const badgeHtml = badgeClass
+                    ? `<span class="badge ${badgeClass}">${expType}</span>`
+                    : `<span class="td-muted">${expType}</span>`;
+
+                const dateStr = (() => {
+                    try {
+                        return new Date(e.date).toLocaleString('en-IN', {
+                            day: '2-digit', month: 'short', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    } catch { return e.date; }
+                })();
+
+                const row = document.createElement('tr');
+                if (highlightId && e.id === highlightId) row.classList.add('row-new');
+                row.innerHTML = `
+            <td class="td-muted">${dateStr}</td>
+            <td class="td-name">${e.name}</td>
+            <td>${badgeHtml}</td>
+            <td class="td-amount">₹${parseFloat(e.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        `;
+                tbody.appendChild(row);
+            });
+
+            updateSummary(all);
+        }
+
+        /* ── Form Validation ── */
+        const driverValidationFields = [
+            { id: 'driverName', grp: 'grp-driverName' },
+            { id: 'entryDate', grp: 'grp-entryDate' },
+            { id: 'expenseType', grp: 'grp-expenseType' },
+            { id: 'amount', grp: 'grp-amount' },
+        ];
+
+        driverValidationFields.forEach(({ id, grp }) => {
+            const input = document.getElementById(id);
+            const group = document.getElementById(grp);
+            if (!input || !group) return;
+            input.addEventListener('blur', () => {
+                group.classList.toggle('has-error', !input.value.trim());
+            });
+            input.addEventListener('input', () => {
+                if (input.value.trim()) group.classList.remove('has-error');
+            });
+            input.addEventListener('change', () => {
+                if (input.value.trim()) group.classList.remove('has-error');
+            });
+        });
+
+        function validateDriverForm() {
+            let valid = true;
+            driverValidationFields.forEach(({ id, grp }) => {
+                const input = document.getElementById(id);
+                const group = document.getElementById(grp);
+                if (!input || !group) return;
+                if (!input.value.trim()) {
+                    group.classList.add('has-error');
+                    valid = false;
+                } else {
+                    group.classList.remove('has-error');
+                }
+            });
+            return valid;
+        }
+
+        /* ── Form Submit ── */
+        const driverForm = document.getElementById('driverForm');
+        const saveBtn = document.getElementById('btnSaveDriver');
+
+        driverForm.addEventListener('submit', e => {
+            e.preventDefault();
+
+            if (!validateDriverForm()) {
+                showToast('Please fill in all required fields.', 'error');
+                const firstErr = driverForm.querySelector('.has-error input, .has-error select');
+                if (firstErr) firstErr.focus();
+                return;
+            }
+
+            /* Loading state */
+            saveBtn.disabled = true;
+            saveBtn.classList.add('btn-loading');
+            const icon = saveBtn.querySelector('i');
+            if (icon) icon.style.display = 'none';
+
+            const newId = Date.now();
+
+            setTimeout(() => {
+                saveDriverEntry({
+                    id: newId,
+                    name: document.getElementById('driverName').value.trim(),
+                    date: document.getElementById('entryDate').value,
+                    expenseType: document.getElementById('expenseType').value,
+                    amount: document.getElementById('amount').value
+                });
+
+                driverForm.reset();
+                document.getElementById('entryDate').value = nowLocal();
+                /* Clear validation */
+                driverForm.querySelectorAll('.has-error').forEach(g => g.classList.remove('has-error'));
+
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('btn-loading');
+                if (icon) icon.style.display = '';
+                lucide.createIcons({ nodes: [saveBtn] });
+
+                renderTable(newId);
+                showToast('Driver entry saved successfully!', 'success');
+            }, 280);
+        });
+
+        /* ── Clear Form ── */
+        document.getElementById('btnClearDriver').addEventListener('click', () => {
+            driverForm.reset();
+            document.getElementById('entryDate').value = nowLocal();
+            driverForm.querySelectorAll('.has-error').forEach(g => g.classList.remove('has-error'));
+            showToast('Form cleared.', 'info');
+        });
+
+        /* ── Reset Flow ── */
+        const resetModal = document.getElementById('driverResetModal');
+
+        document.getElementById('btnResetDriverEntries')
+            .addEventListener('click', () => resetModal.classList.add('active'));
+
+        document.getElementById('btnCancelDriverReset')
+            .addEventListener('click', () => resetModal.classList.remove('active'));
+
+        resetModal.addEventListener('click', e => {
+            if (e.target === resetModal) resetModal.classList.remove('active');
+        });
+
+        document.getElementById('btnConfirmDriverReset').addEventListener('click', () => {
+            localStorage.removeItem('sk_driver_data');
+            resetModal.classList.remove('active');
+            renderTable();
+            showToast('All driver entries have been reset.', 'info');
+        });
+
+        /* ── Init ── */
+        renderTable();
+    </script>
+</body>
+
+</html>
